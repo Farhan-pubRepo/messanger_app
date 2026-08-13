@@ -2,7 +2,11 @@ import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
-import { generateAIReply, isAIConfigured } from "../services/ai.service.js";
+import {
+	generateAIReply,
+	isAIConfigured,
+	notConfiguredMessage,
+} from "../services/ai.service.js";
 
 export const sendMessage = async (req, res) => {
 	try {
@@ -80,10 +84,8 @@ const replyAsAI = async ({ conversation, aiUserId, humanId }) => {
 	};
 
 	try {
-		if (!isAIConfigured()) {
-			await deliver(
-				"I'm not connected yet — add ANTHROPIC_API_KEY to the backend .env and restart the server."
-			);
+		if (!(await isAIConfigured())) {
+			await deliver(notConfiguredMessage());
 			return;
 		}
 
