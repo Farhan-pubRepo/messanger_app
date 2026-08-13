@@ -20,17 +20,15 @@ export const signup = async (req, res) => {
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
 
-		// https://avatar-placeholder.iran.liara.run/
-
-		const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
-		const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
-
+		// Left empty on purpose: the client draws initials on a colour derived
+		// from the name. Avoids depending on an external avatar host, which is
+		// exactly what broke here — avatar.iran.liara.run started returning 502.
 		const newUser = new User({
 			fullName,
 			username,
 			password: hashedPassword,
 			gender,
-			profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
+			profilePic: "",
 		});
 
 		if (newUser) {

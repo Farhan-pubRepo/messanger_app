@@ -43,7 +43,8 @@ const run = async () => {
 		username: USERNAME,
 		password: hashedPassword,
 		gender: "female",
-		profilePic: `https://avatar.iran.liara.run/public/girl?username=${USERNAME}`,
+		// Empty: the client renders initials locally, no external avatar host.
+		profilePic: "",
 		isAI: true,
 	});
 
