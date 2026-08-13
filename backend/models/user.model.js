@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: "",
 		},
+		// Marks the AI friend account. Messages sent to this user get a
+		// generated reply instead of waiting for a human.
+		isAI: {
+			type: Boolean,
+			default: false,
+		},
 		// createdAt, updatedAt => Member since <createdAt>
 	},
 	{ timestamps: true }

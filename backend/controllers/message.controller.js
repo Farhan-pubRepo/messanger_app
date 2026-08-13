@@ -1,6 +1,8 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import User from "../models/user.model.js";
 import { getReceiverSocketId, io } from "../socket/socket.js";
+import { generateAIReply, isAIConfigured } from "../services/ai.service.js";
 
 export const sendMessage = async (req, res) => {
 	try {
@@ -41,10 +43,59 @@ export const sendMessage = async (req, res) => {
 			io.to(receiverSocketId).emit("newMessage", newMessage);
 		}
 
+		// Respond to the sender first so the UI isn't blocked on the model call,
+		// then generate the AI reply in the background if this is the AI friend.
 		res.status(201).json(newMessage);
+
+		const receiver = await User.findById(receiverId).select("isAI").lean();
+		if (receiver?.isAI) {
+			replyAsAI({ conversation, aiUserId: receiverId, humanId: senderId });
+		}
 	} catch (error) {
 		console.log("Error in sendMessage controller: ", error.message);
 		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+/**
+ * Generate and deliver the AI friend's reply. Runs after the HTTP response has
+ * been sent, so it must never throw into the request cycle — any failure is
+ * delivered to the user as a chat message instead.
+ */
+const replyAsAI = async ({ conversation, aiUserId, humanId }) => {
+	const deliver = async (text) => {
+		const aiMessage = new Message({
+			senderId: aiUserId,
+			receiverId: humanId,
+			message: text,
+		});
+
+		conversation.messages.push(aiMessage._id);
+		await Promise.all([conversation.save(), aiMessage.save()]);
+
+		const humanSocketId = getReceiverSocketId(humanId);
+		if (humanSocketId) {
+			io.to(humanSocketId).emit("newMessage", aiMessage);
+		}
+	};
+
+	try {
+		if (!isAIConfigured()) {
+			await deliver(
+				"I'm not connected yet — add ANTHROPIC_API_KEY to the backend .env and restart the server."
+			);
+			return;
+		}
+
+		const reply = await generateAIReply(conversation, aiUserId);
+		await deliver(reply);
+	} catch (error) {
+		console.log("Error generating AI reply: ", error.message);
+		try {
+			await deliver("Something went wrong on my end — try me again in a sec.");
+		} catch (deliverError) {
+			console.log("Error delivering AI fallback: ", deliverError.message);
+		}
 	}
 };
 
