@@ -7,8 +7,7 @@
 
 A full-stack real-time chat application with modern authentication and instant messaging capabilities.
 
-Live Demo: [https://your-chat-app.com](https://your-chat-app.com)  
-Backend Repo: [https://github.com/Farhan-pubRepo/chat-app-backend](https://github.com/Farhan-pubRepo/chat-app-backend)
+This repository contains both the React frontend (`frontend/`) and the Express + Socket.io backend (`backend/`).
 
 ## ✨ Features
 - 🔒 JWT Authentication & Authorization
