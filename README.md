@@ -7,6 +7,8 @@
 
 A full-stack real-time chat application with modern authentication and instant messaging capabilities.
 
+**Live demo: https://messanger-app-o7lv.onrender.com**
+
 This repository contains both the React frontend (`frontend/`) and the Express + Socket.io backend (`backend/`).
 
 ### Demo account
