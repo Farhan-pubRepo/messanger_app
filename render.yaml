@@ -5,7 +5,10 @@ services:
     name: messanger-app
     runtime: node
     plan: free
-    buildCommand: npm run build
+    # NODE_ENV=production below makes npm skip devDependencies, but vite and
+    # tailwind live there and the client build needs them. --include=dev
+    # forces them in for the build only; runtime still runs in production.
+    buildCommand: npm install --include=dev && npm install --include=dev --prefix frontend && npm run build --prefix frontend
     startCommand: npm start
     healthCheckPath: /
     envVars:
