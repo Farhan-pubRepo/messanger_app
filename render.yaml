@@ -1,0 +1,26 @@
+# Render blueprint. In the Render dashboard: New > Blueprint, point it at this
+# repo, then fill in the values marked sync:false.
+services:
+  - type: web
+    name: messanger-app
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Paste your MongoDB Atlas connection string in the dashboard.
+      - key: MONGO_DB_URI
+        sync: false
+      # Render generates a strong secret; no need to supply one.
+      - key: JWT_SECRET
+        generateValue: true
+      # Aria has no local Ollama in production. Leave as-is and she replies with
+      # a "not configured" notice, or set this to "anthropic" and add the key
+      # below to make her live (this bills against your Anthropic account).
+      - key: AI_PROVIDER
+        value: ollama
+      - key: ANTHROPIC_API_KEY
+        sync: false

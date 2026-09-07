@@ -9,6 +9,16 @@ A full-stack real-time chat application with modern authentication and instant m
 
 This repository contains both the React frontend (`frontend/`) and the Express + Socket.io backend (`backend/`).
 
+### Demo account
+
+The deployed app has a seeded account so you can look around without signing up.
+The login screen has a **Try the demo** button, or sign in manually:
+
+```
+username: demo
+password: demo1234
+```
+
 ## ✨ Features
 - 🔒 JWT Authentication & Authorization
 - ⚡ Real-time messaging with Socket.io
@@ -47,3 +57,24 @@ cd chat-app
 cd client && npm install
 cd ../server && npm install
 
+## Deployment
+
+The backend serves the built frontend, so this ships as a single service rather
+than a split frontend/backend deploy. `npm run build` installs both halves and
+builds the client into `frontend/dist`; `npm start` runs the server, which
+serves that directory and falls through to `index.html` for client-side routes.
+
+`render.yaml` is a Render blueprint for exactly that. Point Render at this repo
+via **New > Blueprint** and supply the values marked `sync:false`
+(`MONGO_DB_URI`, and `ANTHROPIC_API_KEY` only if you want Aria live).
+
+Required environment variables are documented in `.env.example`.
+
+After the first deploy, seed the demo account against the production database:
+
+```bash
+node backend/seeds/createDemoUser.js
+```
+
+Note that Render's free tier sleeps after inactivity, so the first request after
+an idle period takes roughly a minute to wake.

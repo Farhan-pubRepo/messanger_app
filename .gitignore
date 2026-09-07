@@ -27,3 +27,5 @@ dist-ssr
 
 # backups of .env must never be committed
 .env.*
+# ...but the committed template holds no secrets
+!.env.example

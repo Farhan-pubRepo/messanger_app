@@ -5,8 +5,12 @@ import io from "socket.io-client";
 
 const SocketContext = createContext();
 
-// Point at our own backend. Override with VITE_SOCKET_URL for deployed builds.
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:5001";
+// In a production build the backend serves this bundle, so the socket lives on
+// the same origin as the page. In dev, Vite serves on :3000 while the backend
+// listens on :5001. VITE_SOCKET_URL overrides both.
+const SOCKET_URL =
+	import.meta.env.VITE_SOCKET_URL ||
+	(import.meta.env.PROD ? window.location.origin : "http://localhost:5001");
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const useSocketContext = () => {
